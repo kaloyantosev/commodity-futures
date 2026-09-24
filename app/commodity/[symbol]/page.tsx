@@ -2,91 +2,15 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import CommodityTabs, { CommodityTabsProps } from '@/components/CommodityTabs';
 import { CurvePoint } from '@/components/ForwardCurveChart';
-import { COMMODITIES, getCommodity } from '@/lib/commodities';
+import { getCommodity } from '@/lib/commodities';
+import {
+  getCurveData,
+  getHistoryData,
+  getSeasonalityData,
+} from '@/lib/data';
 
-// ─── Base URL helper ────────────────────────────────────────────────────────
-function getBaseUrl(): string {
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;
-  return 'http://localhost:3000';
-}
-
-// ─── Data fetchers ──────────────────────────────────────────────────────────
-
-async function fetchCurve(symbol: string) {
-  try {
-    const res = await fetch(`${getBaseUrl()}/api/curve/${symbol.toUpperCase()}`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
-
-async function fetchHistory(symbol: string) {
-  try {
-    const res = await fetch(`${getBaseUrl()}/api/history/${symbol.toUpperCase()}?months=24`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
-
-    // Flatten nested volatility + compute derived fields from raw data
-    const data: Array<{ date: string; close: number; volume: number }> = json.data ?? [];
-    const closes: number[] = data.map((d: { close: number }) => d.close);
-
-    // 52-week high/low from the last ~252 trading days
-    const recentCloses = closes.slice(-252);
-    const high52w = recentCloses.length > 0 ? Math.max(...recentCloses) : null;
-    const low52w = recentCloses.length > 0 ? Math.min(...recentCloses) : null;
-
-    // Average daily volume
-    const volumes: number[] = data.map((d: { volume: number }) => d.volume).filter((v: number) => v > 0);
-    const avgVolume = volumes.length > 0
-      ? Math.round(volumes.reduce((a: number, b: number) => a + b, 0) / volumes.length)
-      : null;
-
-    // Calendar spread proxy: M1 close minus 30-day-ago close as a simple spread series
-    const MONTH_ABBREVS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const spreadHistory = data.slice(-90).map((d: { date: string; close: number }, i: number, arr: { close: number }[]) => {
-      const spread = i > 0 ? parseFloat((d.close - arr[i - 1].close).toFixed(3)) : 0;
-      const dt = new Date(d.date);
-      return { date: `${MONTH_ABBREVS[dt.getMonth()]} ${dt.getDate()}`, spread };
-    });
-
-    return {
-      hv10: json.volatility?.hv10 ?? 0,
-      hv20: json.volatility?.hv20 ?? 0,
-      hv60: json.volatility?.hv60 ?? 0,
-      high52w,
-      low52w,
-      avgVolume,
-      spreadHistory,
-    };
-  } catch {
-    return null;
-  }
-}
-
-async function fetchSeasonality(symbol: string) {
-  try {
-    const res = await fetch(`${getBaseUrl()}/api/seasonality/${symbol.toUpperCase()}`, {
-      next: { revalidate: 86400 },
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
-
-// ─── Static params (pre-render all known commodity pages) ──────────────────
-
-export async function generateStaticParams() {
-  return COMMODITIES.map((c) => ({ symbol: c.symbol.toLowerCase() }));
-}
+// Enable dynamic rendering with a 5-minute cache (ISR)
+export const revalidate = 300;
 
 // ─── Metadata ───────────────────────────────────────────────────────────────
 
@@ -104,9 +28,7 @@ export async function generateMetadata({ params }: PageProps) {
   };
 }
 
-// ─── Fallback curve helper ─────────────────────────────────────────────────
-// Used when the API is unavailable to generate a plausible dummy curve
-// so the page still renders (shows shape but with placeholder prices).
+// ─── Fallback helpers (used only if external Yahoo API is unreachable) ────────
 
 const MONTH_ABBREVS = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -120,13 +42,12 @@ function buildFallbackCurve(basePrice: number, symbol: string): CurvePoint[] {
     const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
     const mi = d.getMonth();
     const yr = d.getFullYear().toString().slice(-2);
-    const noise = (Math.random() - 0.5) * basePrice * 0.005;
-    const slippage = i * basePrice * 0.003; // mild contango
+    const slippage = i * basePrice * 0.003;
     return {
       ticker: `${symbol}${MONTH_CODES[mi]}${yr}`,
       month: `${MONTH_ABBREVS[mi]} '${yr}`,
       monthCode: `${MONTH_CODES[mi]}${yr}`,
-      price: parseFloat((basePrice + slippage + noise).toFixed(2)),
+      price: parseFloat((basePrice + slippage).toFixed(2)),
     };
   });
 }
@@ -150,12 +71,22 @@ function buildFallbackSeasonality(symbol: string) {
   };
 }
 
-function buildFallbackHistory() {
+interface TabHistory {
+  hv10: number;
+  hv20: number;
+  hv60: number;
+  high52w: number | null;
+  low52w: number | null;
+  avgVolume: number | null;
+  spreadHistory: Array<{ date: string; spread: number }>;
+}
+
+function buildFallbackHistory(): TabHistory {
   const MONTH_ABBREVS2 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   return {
-    hv10: parseFloat((15 + Math.random() * 25).toFixed(1)),
-    hv20: parseFloat((18 + Math.random() * 22).toFixed(1)),
-    hv60: parseFloat((20 + Math.random() * 18).toFixed(1)),
+    hv10: 22.4,
+    hv20: 24.1,
+    hv60: 26.5,
     high52w: null,
     low52w: null,
     avgVolume: null,
@@ -164,7 +95,7 @@ function buildFallbackHistory() {
       d.setDate(d.getDate() - (89 - i));
       return {
         date: `${MONTH_ABBREVS2[d.getMonth()]} ${d.getDate()}`,
-        spread: parseFloat(((Math.random() - 0.48) * 2).toFixed(3)),
+        spread: parseFloat(((Math.random() - 0.48) * 1.5).toFixed(3)),
       };
     }),
   };
@@ -179,25 +110,54 @@ export default async function CommodityDetailPage({ params }: PageProps) {
 
   if (!commodity) notFound();
 
-  // Fetch all data in parallel; each function handles its own errors
-  const [curveData, historyData, seasonalityData] = await Promise.all([
-    fetchCurve(sym),
-    fetchHistory(sym),
-    fetchSeasonality(sym),
+  // Call data layer directly in code — NO HTTP fetch to localhost/Vercel
+  const [curveData, historyRaw, seasonalityRaw] = await Promise.all([
+    getCurveData(sym).catch(() => null),
+    getHistoryData(sym, 24).catch(() => null),
+    getSeasonalityData(sym).catch(() => null),
   ]);
 
-  // Use API data where available, fallback to generated placeholder otherwise
+  // Transform history data for tabs
+  let history: TabHistory = buildFallbackHistory();
+  if (historyRaw && historyRaw.data.length > 0) {
+    const data = historyRaw.data;
+    const closes = data.map((d) => d.close);
+    const recentCloses = closes.slice(-252);
+    const high52w = recentCloses.length > 0 ? Math.max(...recentCloses) : null;
+    const low52w = recentCloses.length > 0 ? Math.min(...recentCloses) : null;
+
+    const volumes = data.map((d) => d.volume).filter((v) => v > 0);
+    const avgVolume = volumes.length > 0
+      ? Math.round(volumes.reduce((a, b) => a + b, 0) / volumes.length)
+      : null;
+
+    const spreadHistory = data.slice(-90).map((d, i, arr) => {
+      const spread = i > 0 ? parseFloat((d.close - arr[i - 1].close).toFixed(3)) : 0;
+      const dt = new Date(d.date);
+      return { date: `${MONTH_ABBREVS[dt.getMonth()]} ${dt.getDate()}`, spread };
+    });
+
+    history = {
+      hv10: historyRaw.volatility.hv10,
+      hv20: historyRaw.volatility.hv20,
+      hv60: historyRaw.volatility.hv60,
+      high52w,
+      low52w,
+      avgVolume,
+      spreadHistory,
+    };
+  }
+
   const curve = curveData ?? {
     points: buildFallbackCurve(100, sym),
-    curveShape: 'contango',
+    curveShape: 'contango' as const,
     rollYield: -3.5,
     frontPrice: 100,
     frontChange: 0,
     frontChangePercent: 0,
   };
 
-  const history = historyData ?? buildFallbackHistory();
-  const seasonality = seasonalityData ?? buildFallbackSeasonality(sym);
+  const seasonality = seasonalityRaw ?? buildFallbackSeasonality(sym);
 
   const tabsProps: CommodityTabsProps = {
     symbol: commodity.symbol,
@@ -205,7 +165,6 @@ export default async function CommodityDetailPage({ params }: PageProps) {
     sector: commodity.sector,
     color: commodity.color,
     unit: commodity.unit,
-    // Price from curve API (most up to date) or fallback to 0
     price: curveData?.frontPrice ?? 0,
     change: curveData?.frontChange ?? 0,
     changePercent: curveData?.frontChangePercent ?? 0,

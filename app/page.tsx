@@ -2,51 +2,16 @@ import React from 'react';
 import ProcessingSpreads from '@/components/ProcessingSpreads';
 import RollCalendar from '@/components/RollCalendar';
 import SectorTabsAndGrid, { CommodityOverview } from '@/components/SectorTabsAndGrid';
+import { getOverviewData, getSpreadsData } from '@/lib/data';
 
-// ─── Base URL for server-side fetch ────────────────────────────────────────
-// In server components, fetch() requires absolute URLs.
-// Vercel injects VERCEL_URL automatically in all deployments.
-function getBaseUrl(): string {
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;
-  return 'http://localhost:3000';
-}
-
-// ─── Data fetchers ──────────────────────────────────────────────────────────
-
-async function fetchOverview(): Promise<CommodityOverview[]> {
-  try {
-    const res = await fetch(`${getBaseUrl()}/api/overview`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) throw new Error(`overview fetch failed: ${res.status}`);
-    return res.json();
-  } catch (err) {
-    console.error('[dashboard] fetchOverview error:', err);
-    return [];
-  }
-}
-
-async function fetchSpreads() {
-  try {
-    const res = await fetch(`${getBaseUrl()}/api/spreads`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) throw new Error(`spreads fetch failed: ${res.status}`);
-    return res.json();
-  } catch (err) {
-    console.error('[dashboard] fetchSpreads error:', err);
-    // Return null — ProcessingSpreads handles missing data gracefully
-    return null;
-  }
-}
-
-// ─── Page ───────────────────────────────────────────────────────────────────
+// Cache page for 5 minutes (ISR)
+export const revalidate = 300;
 
 export default async function DashboardPage() {
+  // Direct function calls in Server Component — zero build-time HTTP requests
   const [commodities, spreadsData] = await Promise.all([
-    fetchOverview(),
-    fetchSpreads(),
+    getOverviewData().catch(() => [] as CommodityOverview[]),
+    getSpreadsData().catch(() => null),
   ]);
 
   const now = new Date();
@@ -82,7 +47,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Commodity Grid with Sector Tabs (Client Component) ───── */}
+      {/* ── Commodity Grid with Sector Tabs ──────────────────────── */}
       <section>
         <SectorTabsAndGrid commodities={commodities} />
       </section>
