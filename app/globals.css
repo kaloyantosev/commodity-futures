@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Root Variables ──────────────────────────────────────────────────────── */
+:root {
+  --bg-base: #0a0e1a;
+  --bg-card: #0f1629;
+  --border: #1e2d4a;
+  --font-mono: 'Courier New', Courier, 'Lucida Console', monospace;
+}
+
+/* ─── Base Resets ─────────────────────────────────────────────────────────── */
+html,
+body {
+  background-color: var(--bg-base);
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Monospace Numerics ──────────────────────────────────────────────────── */
+.font-numeric {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Custom Scrollbar (Webkit) ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e2d4a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2a3f6a;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--bg-base);
+}
+
+/* ─── Firefox Scrollbar ───────────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1e2d4a var(--bg-base);
+}
+
+/* ─── Recharts Overrides ──────────────────────────────────────────────────── */
+.recharts-cartesian-grid line {
+  stroke: #1e2d4a !important;
+}
+
+.recharts-text {
+  fill: #94a3b8 !important;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+/* ─── Utility Classes ─────────────────────────────────────────────────────── */
+@layer utilities {
+  .text-positive {
+    @apply text-emerald-400;
+  }
+  .text-negative {
+    @apply text-red-400;
+  }
+  .bg-card {
+    background-color: var(--bg-card);
+  }
+  .border-base {
+    border-color: var(--border);
+  }
+}
+
+/* ─── Animations ──────────────────────────────────────────────────────────── */
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.live-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
