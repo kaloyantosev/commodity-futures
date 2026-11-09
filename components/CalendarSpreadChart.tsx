@@ -22,7 +22,12 @@ interface SpreadDataPoint {
 interface CalendarSpreadChartProps {
   data: SpreadDataPoint[];
   label: string;
+  unit?: string;
 }
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+/** '2026-11-03' -> 'Nov 3' */
+const shortDate = (d: string) => (/^\d{4}-\d{2}-\d{2}$/.test(d) ? `${MONTHS[Number(d.slice(5, 7)) - 1]} ${Number(d.slice(8))}` : d);
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -36,7 +41,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const isPositive = value >= 0;
   return (
     <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-lg px-3 py-2 shadow-xl">
-      <p className="text-slate-400 text-xs mb-1">{label}</p>
+      <p className="text-slate-400 text-xs mb-1">{label ? shortDate(label) : ''}</p>
       <p
         className={[
           'font-numeric font-semibold text-sm tabular-nums',
@@ -56,6 +61,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 export default function CalendarSpreadChart({
   data,
   label,
+  unit,
 }: CalendarSpreadChartProps) {
   if (!data || data.length === 0) {
     return (
@@ -85,7 +91,7 @@ export default function CalendarSpreadChart({
         <div>
           <p className="text-white font-semibold text-sm">{label}</p>
           <p className="text-slate-500 text-xs mt-0.5">
-            M1–M2 spread · positive = backwardation
+            Front contract minus second contract{unit ? ` (${unit})` : ''} · positive = backwardation · last {data.length} sessions
           </p>
         </div>
         <div className="flex items-center gap-3 text-[10px]">
@@ -118,6 +124,8 @@ export default function CalendarSpreadChart({
           <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" vertical={false} />
           <XAxis
             dataKey="date"
+            tickFormatter={shortDate}
+            minTickGap={40}
             tick={{ fill: '#64748b', fontSize: 10 }}
             axisLine={{ stroke: '#1e2d4a' }}
             tickLine={false}

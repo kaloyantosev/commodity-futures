@@ -1,186 +1,40 @@
-# Commodity Futures Platform
+# CommodIntel — Commodity Futures Dashboard
 
-An institutional-grade commodity futures analysis platform built with **Next.js 14**, providing deep market intelligence across energy, metals, and agricultural futures markets.
+Live prices, forward curves, spreads, seasonality and roll dates for 14 liquid commodity futures. Next.js 15 (App Router), Recharts, data from Yahoo Finance via `yahoo-finance2`. No API keys needed.
 
----
+## Pages
 
-## Features
-
-| Module | Description |
+| Page | What it shows |
 |---|---|
-| **Forward Curve** | Interactive multi-contract term structure visualization with contango/backwardation detection |
-| **Calendar Spreads** | Near-far month differential analysis with seasonal overlays and historical percentile rankings |
-| **Processing Spreads** | Crack spreads (3-2-1, 2-1-1), crush spreads (soybean meal + oil vs. beans), and spark spreads (natural gas vs. power) |
-| **Seasonality Analysis** | Multi-year seasonal price patterns with statistical confidence bands per commodity |
-| **Volatility Metrics** | Realized vs. implied volatility, historical vol cones, and rolling ATR across tenors |
-| **Roll Calendar** | First notice dates, last trade dates, and optimal roll windows with cost estimation |
-| **COT Integration** | CFTC Commitments of Traders data with managed money positioning, net change, and extreme readings |
+| **Dashboard** `/` | Front-month prices by sector, live processing spreads, upcoming roll dates |
+| **Spreads** `/spreads` | 3:2:1 crack, gasoline crack, heating-oil crack and soybean crush: live value, 2-year percentile, daily history. Calendar-spread table (M1, M2, M1 − M2, annualized roll yield, 12-month curve shape) for every commodity |
+| **Seasonality** `/seasonality?symbol=CL` | 10 years of month-end to month-end returns: average, median, share of up years, best/worst, this year to date |
+| **Commodity** `/commodity/CL` | Price and realized volatility, forward curve with roll yield, daily M1 − M2 calendar spread from the two nearest contracts, seasonality, contract roll calendar |
 
----
+## Covered markets
 
-## Data Sources
+Energy: WTI (CL), Brent (BZ), Natural Gas (NG), RBOB (RB), Heating Oil (HO) · Metals: Gold (GC), Silver (SI), Copper (HG) · Agriculture: Corn (ZC), Wheat (ZW), Soybeans (ZS), Sugar No.11 (SB), Coffee (KC), Cocoa (CC)
 
-| Source | Key Required | Usage |
-|---|---|---|
-| **yahoo-finance2** | ❌ No key needed | Futures chain quotes, OHLCV history for all listed contracts |
-| **Alpha Vantage** | ✅ Free key (25 req/day) | Commodity spot prices (WTI, Brent, natural gas, precious metals, agricultural) |
-| **CFTC** | ❌ Public endpoint | Weekly COT reports from `publicreporting.cftc.gov` (no registration required) |
+## Method notes
 
----
+- **No placeholder data.** If Yahoo Finance doesn't return a series, the page says it is unavailable instead of showing stand-in numbers.
+- **Processing spreads** use front-month continuous futures: 3:2:1 crack = (2 × RBOB × 42 + HO × 42 − 3 × WTI) / 3 in $/bbl; soybean crush = soy oil × 11 lb + meal × 44 lb − soybeans, in $/bu.
+- **Calendar spreads** use the specific contract months (e.g. `CLZ26.NYM`, `CLF27.NYM`), not the continuous series. Roll yield = (M1 / M2 − 1) × 12 / months between contracts.
+- **Seasonality** uses the continuous front-month series, so roll gaps are included. For steep-curve markets (natural gas, softs) part of a monthly average can be roll effect rather than price trend.
+- **Roll calendar** applies CME/NYMEX/COMEX/CBOT contract rules (WTI, natural gas, gold, silver, copper, corn, wheat, soybeans). Exchange holidays are not modelled, so a date can be a business day off around holidays.
 
-## Covered Commodities
+## API routes
 
-### Energy
-- WTI Crude Oil (`CL=F`)
-- Brent Crude Oil (`BZ=F`)
-- Natural Gas (`NG=F`)
-- RBOB Gasoline (`RB=F`)
-- Heating Oil / ULSD (`HO=F`)
+`/api/overview`, `/api/spreads`, `/api/curve/[symbol]`, `/api/history/[symbol]?months=24`, `/api/seasonality/[symbol]`. They share the same functions as the pages (`lib/data.ts`).
 
-### Metals
-- Gold (`GC=F`)
-- Silver (`SI=F`)
-- Copper (`HG=F`)
-
-### Agricultural
-- Corn (`ZC=F`)
-- Wheat (`ZW=F`)
-- Soybeans (`ZS=F`)
-- Sugar No. 11 (`SB=F`)
-- Coffee (`KC=F`)
-- Cocoa (`CC=F`)
-
----
-
-## Local Development
-
-### Prerequisites
-
-- Node.js 18 or later
-- npm 9 or later
-
-### Steps
+## Develop
 
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Copy the environment variable template
-cp .env.example .env.local
-
-# 3. Open .env.local and add your Alpha Vantage API key
-#    Get a free key at: https://www.alphavantage.co/support/#api-key
-ALPHA_VANTAGE_API_KEY=your_key_here
-
-# 4. Start the development server
-npm run dev
+npm run dev     # http://localhost:3000
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Deploys to Vercel as-is; pages revalidate every 5 minutes (seasonality hourly).
 
-> **Note:** The free Alpha Vantage tier is limited to **25 API requests per day**. All API responses are cached in Next.js Route Handler cache with a 1-hour revalidation window to stay within limits. For production, consider upgrading to a paid Alpha Vantage plan (500 req/day at $50/month) or substituting a different spot price provider.
-
----
-
-## Deploying to Vercel
-
-Vercel is the recommended deployment target — the `vercel.json` included in this repo configures API route timeouts appropriately.
-
-1. **Fork** this repository to your own GitHub account.
-2. Go to [vercel.com/new](https://vercel.com/new) and click **Import Project**.
-3. Select your forked repository.
-4. Under **Environment Variables**, add:
-   ```
-   ALPHA_VANTAGE_API_KEY = <your key>
-   ```
-5. Click **Deploy**.
-
-Subsequent pushes to `main` will trigger automatic redeployments.
-
----
-
-## Deploying to GitHub
-
-```bash
-# Initialize git (skip if already done)
-git init
-
-# Stage all files
-git add .
-
-# Create the initial commit
-git commit -m "feat: initial commodity futures platform scaffold"
-
-# Add your remote
-git remote add origin https://github.com/<your-username>/commodity-futures-platform.git
-
-# Push to main
-git push -u origin main
-```
-
----
-
-## Project Structure
-
-```
-commodity-futures-platform/
-├── app/
-│   ├── api/                  # Next.js Route Handlers (server-side data fetching)
-│   │   ├── forward-curve/
-│   │   ├── spreads/
-│   │   ├── seasonality/
-│   │   ├── volatility/
-│   │   ├── roll-calendar/
-│   │   └── cot/
-│   ├── (dashboard)/          # Main analysis pages
-│   ├── layout.tsx
-│   └── page.tsx
-├── components/
-│   ├── charts/               # Recharts-based visualization components
-│   ├── ui/                   # Shared UI primitives
-│   └── commodity/            # Domain-specific components
-├── lib/
-│   ├── yahoo-finance.ts      # yahoo-finance2 wrapper utilities
-│   ├── alpha-vantage.ts      # Alpha Vantage API client
-│   ├── cftc.ts               # CFTC COT data fetcher/parser
-│   └── utils.ts              # General utilities (cn, formatters, etc.)
-├── types/                    # Shared TypeScript types/interfaces
-├── .env.example
-├── .env.local                # ← create this yourself (gitignored)
-├── next.config.mjs
-├── tailwind.config.ts
-├── tsconfig.json
-└── vercel.json
-```
-
----
-
-## API Rate Limits & Caching Strategy
-
-| API | Free Limit | Cache TTL |
-|---|---|---|
-| Alpha Vantage | 25 req/day | 60 minutes (`revalidate: 3600`) |
-| yahoo-finance2 | None (scraping) | 5 minutes (`revalidate: 300`) |
-| CFTC | None (public) | 24 hours (`revalidate: 86400`) |
-
-All caching is handled via Next.js `fetch` cache with `next: { revalidate }` options inside Route Handlers — no external cache store (Redis, etc.) is required for personal use.
-
----
-
-## Tech Stack
-
-- **Framework:** Next.js 14 (App Router)
-- **Language:** TypeScript (strict mode)
-- **Styling:** Tailwind CSS with a custom dark-slate design system
-- **Charts:** Recharts
-- **Date Handling:** date-fns v3
-- **Icons:** Lucide React
-- **Futures Data:** yahoo-finance2
-- **Spot Prices:** Alpha Vantage REST API
-- **COT Data:** CFTC public reporting API
-
----
-
-## License
-
-MIT
+Not investment advice.

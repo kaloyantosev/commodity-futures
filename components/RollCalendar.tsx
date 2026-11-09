@@ -42,17 +42,7 @@ function lastBusinessDayOfMonth(year: number, month: number): Date {
   return d;
 }
 
-/** Business day on or before the Nth of the month */
-function nthOfMonthBizDay(year: number, month: number, day: number): Date {
-  // We want 3 business days before the 25th
-  const target = new Date(year, month, day);
-  return addBusinessDays(target, -3);
-}
 
-/** First day of next month */
-function firstDayOfNextMonth(year: number, month: number): Date {
-  return new Date(year, month + 1, 1);
-}
 
 // ─── Expiry Computation ────────────────────────────────────────────────────
 
@@ -75,82 +65,55 @@ interface ContractSpec {
   getFirstNoticeDay: (ltd: Date, deliveryYear: number, deliveryMonth: number) => Date;
 }
 
+const isBizDay = (d: Date) => d.getDay() !== 0 && d.getDay() !== 6;
+
+/** Last business day of the month before (year, month). */
+function lastBizDayOfPriorMonth(year: number, month: number): Date {
+  return month === 0 ? lastBusinessDayOfMonth(year - 1, 11) : lastBusinessDayOfMonth(year, month - 1);
+}
+
+// Exchange rules (CME/NYMEX/COMEX/CBOT). Exchange holidays are not modelled, so a date
+// can be one business day off around holidays; check the exchange calendar before rolling.
+const COMEX_METAL = {
+  // LTD: third-last business day of the delivery month. FND: last business day of the prior month.
+  getLastTradingDay: (y: number, m: number) => addBusinessDays(lastBusinessDayOfMonth(y, m), -2),
+  getFirstNoticeDay: (_ltd: Date, y: number, m: number) => lastBizDayOfPriorMonth(y, m),
+};
+const CBOT_GRAIN = {
+  // LTD: business day before the 15th of the contract month. FND: last business day of the prior month.
+  getLastTradingDay: (y: number, m: number) => addBusinessDays(new Date(y, m, 15), -1),
+  getFirstNoticeDay: (_ltd: Date, y: number, m: number) => lastBizDayOfPriorMonth(y, m),
+};
+
 const SPECS: ContractSpec[] = [
   {
     commodity: 'WTI Crude Oil',
     symbol: 'CL',
     activeMonths: null,
     getLastTradingDay: (y, m) => {
-      // 3 business days before the 25th of the PRIOR month
-      const priorYear = m === 0 ? y - 1 : y;
-      const priorMonth = m === 0 ? 11 : m - 1;
-      return nthOfMonthBizDay(priorYear, priorMonth, 25);
+      // 3 business days before the 25th of the prior month (4 if the 25th is not a business day)
+      const py = m === 0 ? y - 1 : y;
+      const pm = m === 0 ? 11 : m - 1;
+      const d25 = new Date(py, pm, 25);
+      return addBusinessDays(d25, isBizDay(d25) ? -3 : -4);
     },
-    getFirstNoticeDay: (ltd) => ltd, // same day
+    // Physically delivered: notices start the business day after trading ends
+    getFirstNoticeDay: (ltd) => addBusinessDays(ltd, 1),
   },
   {
     commodity: 'Natural Gas',
     symbol: 'NG',
     activeMonths: null,
-    getLastTradingDay: (y, m) => {
-      // 3 business days prior to first day of delivery month
-      const firstDay = new Date(y, m, 1);
-      return addBusinessDays(firstDay, -3);
-    },
-    getFirstNoticeDay: (ltd) => ltd,
+    // 3 business days before the first calendar day of the delivery month
+    getLastTradingDay: (y, m) => addBusinessDays(new Date(y, m, 1), -3),
+    getFirstNoticeDay: (ltd) => addBusinessDays(ltd, 1),
   },
-  {
-    commodity: 'Gold',
-    symbol: 'GC',
-    activeMonths: [1, 3, 5, 7, 9, 11], // Feb Apr Jun Aug Oct Dec
-    getLastTradingDay: (y, m) => {
-      // 3 business days before last business day of delivery month
-      const lbd = lastBusinessDayOfMonth(y, m);
-      return addBusinessDays(lbd, -3);
-    },
-    getFirstNoticeDay: (ltd) => addBusinessDays(ltd, -1),
-  },
-  {
-    commodity: 'Silver',
-    symbol: 'SI',
-    activeMonths: [2, 4, 6, 8, 11], // Mar May Jul Sep Dec
-    getLastTradingDay: (y, m) => {
-      const lbd = lastBusinessDayOfMonth(y, m);
-      return addBusinessDays(lbd, -3);
-    },
-    getFirstNoticeDay: (ltd) => addBusinessDays(ltd, -1),
-  },
-  {
-    commodity: 'Corn',
-    symbol: 'ZC',
-    activeMonths: [2, 4, 6, 8, 11], // Mar May Jul Sep Dec
-    getLastTradingDay: (y, m) => {
-      // 2 business days before last business day of the month
-      const lbd = lastBusinessDayOfMonth(y, m);
-      return addBusinessDays(lbd, -2);
-    },
-    getFirstNoticeDay: (ltd) => addBusinessDays(ltd, -1),
-  },
-  {
-    commodity: 'Wheat',
-    symbol: 'ZW',
-    activeMonths: [2, 4, 6, 8, 11],
-    getLastTradingDay: (y, m) => {
-      const lbd = lastBusinessDayOfMonth(y, m);
-      return addBusinessDays(lbd, -2);
-    },
-    getFirstNoticeDay: (ltd) => addBusinessDays(ltd, -1),
-  },
-  {
-    commodity: 'Soybeans',
-    symbol: 'ZS',
-    activeMonths: [0, 2, 4, 6, 7, 9, 10], // Jan Mar May Jul Aug Sep Nov
-    getLastTradingDay: (y, m) => {
-      const lbd = lastBusinessDayOfMonth(y, m);
-      return addBusinessDays(lbd, -2);
-    },
-    getFirstNoticeDay: (ltd) => addBusinessDays(ltd, -1),
-  },
+  { commodity: 'Gold', symbol: 'GC', activeMonths: [1, 3, 5, 7, 9, 11], ...COMEX_METAL },
+  { commodity: 'Silver', symbol: 'SI', activeMonths: [2, 4, 6, 8, 11], ...COMEX_METAL },
+  { commodity: 'Copper', symbol: 'HG', activeMonths: [2, 4, 6, 8, 11], ...COMEX_METAL },
+  { commodity: 'Corn', symbol: 'ZC', activeMonths: [2, 4, 6, 8, 11], ...CBOT_GRAIN },
+  { commodity: 'Wheat', symbol: 'ZW', activeMonths: [2, 4, 6, 8, 11], ...CBOT_GRAIN },
+  { commodity: 'Soybeans', symbol: 'ZS', activeMonths: [0, 2, 4, 6, 7, 8, 10], ...CBOT_GRAIN },
 ];
 
 function generateUpcoming(specList: ContractSpec[], count: number, now: Date): ExpiryRow[] {
@@ -165,7 +128,9 @@ function generateUpcoming(specList: ContractSpec[], count: number, now: Date): E
       if (spec.activeMonths && !spec.activeMonths.includes(month)) continue;
 
       const ltd = spec.getLastTradingDay(year, month);
-      if (ltd <= now) continue;
+      const fndCheck = spec.getFirstNoticeDay(ltd, year, month);
+      // A long position must roll before whichever comes first
+      if ((fndCheck < ltd ? fndCheck : ltd) <= now) continue;
 
       const fnd = spec.getFirstNoticeDay(ltd, year, month);
       const contractMonth = `${MONTH_NAMES[month]} ${year}`;
@@ -174,14 +139,15 @@ function generateUpcoming(specList: ContractSpec[], count: number, now: Date): E
         commodity: spec.commodity,
         symbol: spec.symbol,
         contractMonth,
-        firstNoticeDay: fnd < ltd ? fnd : ltd,
+        firstNoticeDay: fnd,
         lastTradingDay: ltd,
       });
     }
   }
 
   // Sort by LTD ascending
-  rows.sort((a, b) => a.lastTradingDay.getTime() - b.lastTradingDay.getTime());
+  const deadline = (r: ExpiryRow) => Math.min(r.firstNoticeDay.getTime(), r.lastTradingDay.getTime());
+  rows.sort((a, b) => deadline(a) - deadline(b));
   return rows.slice(0, count);
 }
 
@@ -214,9 +180,18 @@ function formatDate(d: Date): string {
 
 // ─── Main Component ────────────────────────────────────────────────────────
 
-export default function RollCalendar() {
+export default function RollCalendar({ symbols }: { symbols?: string[] } = {}) {
   const now = useMemo(() => new Date(), []);
-  const rows = useMemo(() => generateUpcoming(SPECS, 12, now), [now]);
+  const specs = useMemo(() => (symbols ? SPECS.filter((s) => symbols.includes(s.symbol)) : SPECS), [symbols]);
+  const rows = useMemo(() => generateUpcoming(specs, symbols ? 6 : 12, now), [specs, symbols, now]);
+
+  if (symbols && specs.length === 0) {
+    return (
+      <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-xl p-8 text-center text-slate-500 text-sm">
+        Contract calendar rules for {symbols.join(', ')} are not modelled yet. Check the exchange contract specs for first notice and last trading days.
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -224,7 +199,7 @@ export default function RollCalendar() {
       <div className="mb-4">
         <p className="text-white font-semibold text-base">Roll Calendar</p>
         <p className="text-slate-500 text-xs mt-0.5">
-          Upcoming futures contract expiry dates · color coded by days remaining
+          First notice and last trading days · countdown to whichever comes first (the date a long position must roll by) · exchange holidays not modelled
         </p>
       </div>
 
@@ -262,13 +237,13 @@ export default function RollCalendar() {
                 Last Trading Day
               </th>
               <th className="text-right px-4 py-2.5 text-slate-500 font-semibold tracking-wide">
-                Days
+                Days to roll
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#1e2d4a]">
             {rows.map((row, i) => {
-              const days = daysUntil(row.lastTradingDay, now);
+              const days = daysUntil(row.firstNoticeDay < row.lastTradingDay ? row.firstNoticeDay : row.lastTradingDay, now);
               const rowHover = 'hover:bg-white/[0.02] transition-colors';
               return (
                 <tr key={`${row.symbol}-${row.contractMonth}-${i}`} className={rowHover}>

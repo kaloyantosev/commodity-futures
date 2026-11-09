@@ -15,10 +15,10 @@ interface SpreadInputs {
 }
 
 interface ProcessingSpreadsProps {
-  crack_3_2_1: number;
-  soy_crush: number;
-  heating_oil_crack: number;
-  gasoline_crack: number;
+  crack_3_2_1: number | null;
+  soy_crush: number | null;
+  heating_oil_crack: number | null;
+  gasoline_crack: number | null;
   inputs: SpreadInputs;
 }
 
@@ -29,7 +29,7 @@ interface SpreadCardDef {
   title: string;
   formula: string;
   description: string;
-  getValue: (p: ProcessingSpreadsProps) => number;
+  getValue: (p: ProcessingSpreadsProps) => number | null;
   unit: string;
 }
 
@@ -74,9 +74,9 @@ const SPREAD_CARDS: SpreadCardDef[] = [
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
-function SpreadCard({ def, value }: { def: SpreadCardDef; value: number }) {
-  const isPositive = value >= 0;
-  const valueClass = isPositive ? 'text-emerald-400' : 'text-red-400';
+function SpreadCard({ def, value }: { def: SpreadCardDef; value: number | null }) {
+  const isPositive = (value ?? 0) >= 0;
+  const valueClass = value == null ? 'text-slate-500' : isPositive ? 'text-emerald-400' : 'text-red-400';
   const chipClass = isPositive
     ? 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20'
     : 'bg-red-400/10 text-red-400 border-red-400/20';
@@ -88,8 +88,7 @@ function SpreadCard({ def, value }: { def: SpreadCardDef; value: number }) {
         <p className="text-white text-sm font-semibold leading-tight">{def.title}</p>
         <div className="text-right shrink-0">
           <p className={['font-numeric text-xl font-bold tabular-nums', valueClass].join(' ')}>
-            {isPositive ? '+' : ''}
-            {value.toFixed(2)}
+            {value == null ? 'N/A' : `${isPositive ? '+' : ''}${value.toFixed(2)}`}
           </p>
           <p className="text-slate-500 text-[10px]">{def.unit}</p>
         </div>
@@ -152,9 +151,12 @@ export default function ProcessingSpreads(props: ProcessingSpreadsProps) {
     <div className="w-full">
       {/* Section header */}
       <div className="mb-4">
-        <p className="text-white font-semibold text-base">Processing Spreads</p>
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-white font-semibold text-base">Processing Spreads</p>
+          <a href="/spreads" className="text-blue-400 text-xs hover:underline">History &amp; calendar spreads →</a>
+        </div>
         <p className="text-slate-500 text-xs mt-0.5">
-          Refining & crush margins derived from front-month futures prices
+          Refining &amp; crush margins derived from front-month futures prices
         </p>
       </div>
 
