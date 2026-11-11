@@ -44,7 +44,7 @@ const SHAPE_CONFIG = {
   },
   flat: {
     gradientId: 'curveGray',
-    stroke: '#94a3b8',        // slate-400
+    stroke: '#91919b',        // slate-400
     gradientStart: 'rgba(148,163,184,0.25)',
     gradientEnd:   'rgba(148,163,184,0)',
     badge: 'FLAT',
@@ -62,7 +62,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload || payload.length === 0) return null;
   const point = payload[0];
   return (
-    <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-lg px-3 py-2 shadow-xl">
+    <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg px-3 py-2 shadow-xl">
       <p className="text-slate-400 text-xs mb-1">{point.payload.month}</p>
       <p className="font-numeric text-white font-semibold text-sm tabular-nums">
         ${point.value.toFixed(2)}
@@ -108,7 +108,7 @@ export default function ForwardCurveChart({
         </div>
         <span
           className={[
-            'text-[10px] font-bold px-2 py-1 rounded tracking-widest',
+            'text-[10px] font-semibold px-2 py-1 rounded tracking-widest',
             cfg.badgeClass,
           ].join(' ')}
         >
@@ -127,18 +127,18 @@ export default function ForwardCurveChart({
               <stop offset="95%" stopColor={cfg.gradientEnd} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a30" vertical={false} />
           <XAxis
             dataKey="month"
-            tick={{ fill: '#64748b', fontSize: 10 }}
-            axisLine={{ stroke: '#1e2d4a' }}
+            tick={{ fill: '#71717a', fontSize: 10 }}
+            axisLine={{ stroke: '#2a2a30' }}
             tickLine={false}
             interval="preserveStartEnd"
           />
           <YAxis
             domain={yDomain}
             tickFormatter={(v: number) => `$${v.toFixed(0)}`}
-            tick={{ fill: '#64748b', fontSize: 10 }}
+            tick={{ fill: '#71717a', fontSize: 10 }}
             axisLine={false}
             tickLine={false}
             width={52}

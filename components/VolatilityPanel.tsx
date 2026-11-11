@@ -50,7 +50,7 @@ function BarGauge({ pct }: { pct: number }) {
   const fill = Math.min((pct / 80) * 100, 100);
   const colors = getVolatilityColor(pct);
   return (
-    <div className="mt-3 h-1.5 w-full bg-[#1e2d4a] rounded-full overflow-hidden">
+    <div className="mt-3 h-1.5 w-full bg-[#2a2a30] rounded-full overflow-hidden">
       <div
         className={`h-full rounded-full transition-all duration-700 ${
           pct < 20
@@ -71,19 +71,19 @@ function MetricCard({ metric }: { metric: HVMetric }) {
     <div
       className={[
         'flex-1 rounded-lg p-4 border',
-        'bg-[#0f1629]',
+        'bg-[#16161a]',
         colors.border,
       ].join(' ')}
     >
       {/* Top */}
       <div className="flex items-start justify-between mb-2">
         <div>
-          <p className="text-white text-xs font-bold tracking-wide">{metric.key}</p>
+          <p className="text-white text-xs font-semibold tracking-wide">{metric.key}</p>
           <p className="text-slate-500 text-[10px] mt-0.5">{metric.sublabel}</p>
         </div>
         <span
           className={[
-            'text-[9px] font-bold px-1.5 py-0.5 rounded border tracking-wider',
+            'text-[9px] font-semibold px-1.5 py-0.5 rounded border tracking-wider',
             colors.text,
             colors.bg,
             colors.border,
@@ -94,7 +94,7 @@ function MetricCard({ metric }: { metric: HVMetric }) {
       </div>
 
       {/* Value */}
-      <p className={['font-numeric text-2xl font-bold tabular-nums', colors.text].join(' ')}>
+      <p className={['font-numeric text-2xl font-semibold tabular-nums', colors.text].join(' ')}>
         {metric.value.toFixed(1)}
         <span className="text-sm ml-0.5">%</span>
       </p>

@@ -82,12 +82,12 @@ function SpreadCard({ def, value }: { def: SpreadCardDef; value: number | null }
     : 'bg-red-400/10 text-red-400 border-red-400/20';
 
   return (
-    <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-lg p-4 flex flex-col gap-2">
+    <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-4 flex flex-col gap-2">
       {/* Title + value */}
       <div className="flex items-start justify-between gap-2">
         <p className="text-white text-sm font-semibold leading-tight">{def.title}</p>
         <div className="text-right shrink-0">
-          <p className={['font-numeric text-xl font-bold tabular-nums', valueClass].join(' ')}>
+          <p className={['font-numeric text-xl font-semibold tabular-nums', valueClass].join(' ')}>
             {value == null ? 'N/A' : `${isPositive ? '+' : ''}${value.toFixed(2)}`}
           </p>
           <p className="text-slate-500 text-[10px]">{def.unit}</p>
@@ -95,7 +95,7 @@ function SpreadCard({ def, value }: { def: SpreadCardDef; value: number | null }
       </div>
 
       {/* Formula */}
-      <div className="bg-[#0a0e1a] border border-[#1e2d4a] rounded px-2.5 py-1.5">
+      <div className="bg-[#0c0c0e] border border-[#2a2a30] rounded px-2.5 py-1.5">
         <p className="font-mono text-blue-400 text-[10px] tracking-wider">{def.formula}</p>
       </div>
 
@@ -124,7 +124,7 @@ function InputPricesFooter({ inputs }: { inputs: SpreadInputs }) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="mt-4 bg-[#0a0e1a] border border-[#1e2d4a] rounded-lg p-3">
+    <div className="mt-4 bg-[#0c0c0e] border border-[#2a2a30] rounded-lg p-3">
       <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest mb-2">
         Input Prices Used
       </p>

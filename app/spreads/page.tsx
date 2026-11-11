@@ -30,7 +30,7 @@ export default async function SpreadsPage() {
   return (
     <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10">
       <div>
-        <h1 className="text-white text-2xl font-bold tracking-tight">Spreads</h1>
+        <h1 className="text-white text-2xl font-semibold tracking-tight">Spreads</h1>
         <p className="text-slate-400 text-sm mt-1">
           Processing margins (cracks and crush) and calendar spreads, from live front-month and contract-month futures.
         </p>
@@ -47,14 +47,14 @@ export default async function SpreadsPage() {
             const h = histories.find((x) => x.key === s.key);
             const value = live?.[s.key] ?? h?.current ?? null;
             return (
-              <div key={s.key} className="bg-[#0f1629] border border-[#1e2d4a] rounded-lg p-4 flex flex-col gap-3">
+              <div key={s.key} className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-4 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-white text-sm font-semibold">{s.title}</p>
                     <p className="text-slate-500 text-[11px]">{s.note}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className={['font-numeric text-xl font-bold tabular-nums', value == null ? 'text-slate-500' : value >= 0 ? 'text-emerald-400' : 'text-red-400'].join(' ')}>
+                    <p className={['font-numeric text-xl font-semibold tabular-nums', value == null ? 'text-slate-500' : value >= 0 ? 'text-emerald-400' : 'text-red-400'].join(' ')}>
                       {signed(value)}
                     </p>
                     <p className="text-slate-500 text-[10px]">{s.unit}</p>
@@ -68,7 +68,7 @@ export default async function SpreadsPage() {
                   </div>
                 )}
                 <SpreadHistoryChart points={h?.points ?? []} median={h?.median ?? null} unit={s.unit} />
-                <div className="bg-[#0a0e1a] border border-[#1e2d4a] rounded px-2.5 py-1.5">
+                <div className="bg-[#0c0c0e] border border-[#2a2a30] rounded px-2.5 py-1.5">
                   <p className="font-mono text-blue-400 text-[10px] tracking-wider">{s.formula}</p>
                 </div>
               </div>
@@ -90,10 +90,10 @@ export default async function SpreadsPage() {
         <p className="text-slate-500 text-xs mt-0.5 mb-4">
           Nearest listed contract (M1) minus the next one (M2). Positive = backwardation. Roll yield is the annualized gain (or cost) of rolling a long position from M1 to M2.
         </p>
-        <div className="overflow-x-auto rounded-lg border border-[#1e2d4a]">
+        <div className="overflow-x-auto rounded-lg border border-[#2a2a30]">
           <table className="w-full text-xs min-w-[720px]">
             <thead>
-              <tr className="bg-[#0a0e1a] border-b border-[#1e2d4a] text-slate-500">
+              <tr className="bg-[#0c0c0e] border-b border-[#2a2a30] text-slate-500">
                 <th className="text-left px-4 py-2.5 font-semibold">Commodity</th>
                 <th className="text-left px-3 py-2.5 font-semibold">M1</th>
                 <th className="text-left px-3 py-2.5 font-semibold">M2</th>
@@ -102,7 +102,7 @@ export default async function SpreadsPage() {
                 <th className="text-right px-4 py-2.5 font-semibold" title="Front contract vs the contract about 12 months out">12-month curve</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1e2d4a]">
+            <tbody className="divide-y divide-[#2a2a30]">
               {calendar.map((r) => (
                 <tr key={r.symbol} className="hover:bg-white/[0.02]">
                   <td className="px-4 py-2.5">

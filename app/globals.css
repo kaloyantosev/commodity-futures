@@ -4,19 +4,19 @@
 
 /* ─── Root Variables ──────────────────────────────────────────────────────── */
 :root {
-  --bg-base: #0a0e1a;
-  --bg-card: #0f1629;
-  --border: #1e2d4a;
-  --font-mono: 'Courier New', Courier, 'Lucida Console', monospace;
+  --bg-base: #0c0c0e;
+  --bg-card: #16161a;
+  --border: #2a2a30;
+  --font-mono: var(--font-sans), system-ui, sans-serif;
 }
 
 /* ─── Base Resets ─────────────────────────────────────────────────────────── */
 html,
 body {
   background-color: var(--bg-base);
-  color: #ffffff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #ececf0;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  color-scheme: dark;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -25,7 +25,7 @@ body {
 .font-numeric {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
+  
 }
 
 /* ─── Custom Scrollbar (Webkit) ───────────────────────────────────────────── */
@@ -40,12 +40,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e2d4a;
+  background: #2a2a30;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2a3f6a;
+  background: #3a3a42;
 }
 
 ::-webkit-scrollbar-corner {
@@ -55,16 +55,16 @@ body {
 /* ─── Firefox Scrollbar ───────────────────────────────────────────────────── */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #1e2d4a var(--bg-base);
+  scrollbar-color: #2a2a30 var(--bg-base);
 }
 
 /* ─── Recharts Overrides ──────────────────────────────────────────────────── */
 .recharts-cartesian-grid line {
-  stroke: #1e2d4a !important;
+  stroke: #2a2a30 !important;
 }
 
 .recharts-text {
-  fill: #94a3b8 !important;
+  fill: #91919b !important;
 }
 
 .recharts-tooltip-wrapper {

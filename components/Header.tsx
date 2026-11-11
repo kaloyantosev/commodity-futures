@@ -35,16 +35,15 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-[#0a0e1a] border-b border-[#1e2d4a] sticky top-0 z-50">
+    <header className="bg-[#16161a] border-b border-[#2a2a30] sticky top-0 z-50">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
 
           {/* ── Brand ─────────────────────────────────────────────────── */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <BarChart2 className="w-5 h-5 text-blue-400" strokeWidth={2.5} />
-            <span className="text-sm font-black tracking-widest">
-              <span className="text-blue-400">COMMOD</span>
-              <span className="text-white">INTEL</span>
+            <BarChart2 className="w-4 h-4 text-white" strokeWidth={2} />
+            <span className="text-[15px] font-semibold tracking-tight">
+              <span className="text-white">CommodIntel</span>
             </span>
           </Link>
 
@@ -57,10 +56,10 @@ export default function Header() {
                   key={href}
                   href={href}
                   className={[
-                    'px-3 py-1.5 rounded text-xs font-semibold tracking-wide transition-colors',
+                    'px-3 py-1.5 text-sm transition-colors',
                     isActive
-                      ? 'text-blue-400 bg-blue-400/10'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5',
+                      ? 'text-white'
+                      : 'text-slate-400 hover:text-white',
                   ].join(' ')}
                 >
                   {label}
@@ -74,13 +73,13 @@ export default function Header() {
             {/* Live indicator */}
             <div className="flex items-center gap-1.5">
               <span className="live-dot w-2 h-2 rounded-full bg-emerald-400 inline-block" />
-              <span className="text-emerald-400 text-xs font-bold tracking-widest">
+              <span className="text-emerald-400 text-xs font-semibold tracking-widest">
                 LIVE
               </span>
             </div>
 
             {/* Clock */}
-            <div className="hidden sm:flex items-center gap-1 bg-[#0f1629] border border-[#1e2d4a] rounded px-2 py-1">
+            <div className="hidden sm:flex items-center gap-1 bg-[#16161a] border border-[#2a2a30] rounded px-2 py-1">
               <span className="font-numeric text-xs text-slate-300 tabular-nums">
                 {time}
               </span>

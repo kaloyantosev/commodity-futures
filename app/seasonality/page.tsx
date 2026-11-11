@@ -23,7 +23,7 @@ export default async function SeasonalityPage({ searchParams }: PageProps) {
   return (
     <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <div>
-        <h1 className="text-white text-2xl font-bold tracking-tight">Seasonality</h1>
+        <h1 className="text-white text-2xl font-semibold tracking-tight">Seasonality</h1>
         <p className="text-slate-400 text-sm mt-1">
           How each commodity has tended to move in each calendar month over the last 10 years.
         </p>
@@ -44,7 +44,7 @@ export default async function SeasonalityPage({ searchParams }: PageProps) {
                     'px-2.5 py-1 rounded-md text-xs font-semibold border transition-colors',
                     active
                       ? 'bg-blue-400/15 text-blue-300 border-blue-400/40'
-                      : 'text-slate-400 border-[#1e2d4a] hover:text-white hover:border-slate-500',
+                      : 'text-slate-400 border-[#2a2a30] hover:text-white hover:border-slate-500',
                   ].join(' ')}
                 >
                   {c.name}
@@ -55,7 +55,7 @@ export default async function SeasonalityPage({ searchParams }: PageProps) {
         ))}
       </div>
 
-      <section className="bg-[#0f1629] border border-[#1e2d4a] rounded-xl p-5">
+      <section className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
           <p className="text-white font-semibold">
             {commodity.name} <span className="text-slate-500 font-mono text-xs ml-1">{commodity.yahooFrontMonth}</span>

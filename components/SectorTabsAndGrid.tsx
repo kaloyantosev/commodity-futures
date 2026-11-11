@@ -37,25 +37,22 @@ export default function SectorTabsAndGrid({ commodities }: SectorTabsAndGridProp
   return (
     <div className="w-full">
       {/* ── Sector Filter Tabs ──────────────────────────────────── */}
-      <div className="flex items-center gap-1 mb-5 border-b border-[#1e2d4a] pb-0">
+      <div className="flex items-center gap-2 mb-5">
         {SECTORS.map((sector) => (
           <button
             key={sector}
             onClick={() => setActiveSector(sector)}
             className={[
-              'px-3 py-2 text-xs font-semibold tracking-wide transition-all relative',
+              'rounded-full border px-3 py-1 text-sm transition-colors',
               activeSector === sector
-                ? 'text-blue-400'
-                : 'text-slate-500 hover:text-slate-300',
+                ? 'border-white bg-white text-[#0c0c0e]'
+                : 'border-[#2a2a30] text-slate-400 hover:text-white',
             ].join(' ')}
           >
             {sector}
-            {activeSector === sector && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400 rounded-t-full" />
-            )}
           </button>
         ))}
-        <span className="ml-auto text-slate-600 text-[10px] font-mono pb-2">
+        <span className="ml-auto text-slate-500 text-xs">
           {filtered.length} contract{filtered.length !== 1 ? 's' : ''}
         </span>
       </div>

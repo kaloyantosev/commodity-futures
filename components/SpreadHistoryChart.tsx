@@ -22,14 +22,14 @@ export default function SpreadHistoryChart({
   return (
     <ResponsiveContainer width="100%" height={140}>
       <LineChart data={points} margin={{ top: 6, right: 6, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" vertical={false} />
-        <XAxis dataKey="date" tickFormatter={tick} minTickGap={50} tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
-        <YAxis tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} width={36} domain={['auto', 'auto']} />
-        {median != null && <ReferenceLine y={median} stroke="#475569" strokeDasharray="4 4" />}
-        <ReferenceLine y={0} stroke="#334155" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#2a2a30" vertical={false} />
+        <XAxis dataKey="date" tickFormatter={tick} minTickGap={50} tick={{ fill: '#71717a', fontSize: 9 }} axisLine={false} tickLine={false} />
+        <YAxis tick={{ fill: '#71717a', fontSize: 9 }} axisLine={false} tickLine={false} width={36} domain={['auto', 'auto']} />
+        {median != null && <ReferenceLine y={median} stroke="#52525b" strokeDasharray="4 4" />}
+        <ReferenceLine y={0} stroke="#3f3f46" />
         <Tooltip
-          contentStyle={{ background: '#0f1629', border: '1px solid #1e2d4a', borderRadius: 8, fontSize: 11 }}
-          labelStyle={{ color: '#94a3b8' }}
+          contentStyle={{ background: '#16161a', border: '1px solid #2a2a30', borderRadius: 8, fontSize: 11 }}
+          labelStyle={{ color: '#91919b' }}
           formatter={(v: number) => [`${v.toFixed(2)} ${unit}`, 'Spread']}
         />
         <Line type="monotone" dataKey="value" stroke={color} strokeWidth={1.5} dot={false} isAnimationActive={false} />

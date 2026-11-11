@@ -40,7 +40,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const value = payload[0]?.value ?? 0;
   const isPositive = value >= 0;
   return (
-    <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-lg px-3 py-2 shadow-xl">
+    <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg px-3 py-2 shadow-xl">
       <p className="text-slate-400 text-xs mb-1">{label ? shortDate(label) : ''}</p>
       <p
         className={[
@@ -121,26 +121,26 @@ export default function CalendarSpreadChart({
               <stop offset="95%" stopColor="rgba(248,113,113,0.3)" />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a30" vertical={false} />
           <XAxis
             dataKey="date"
             tickFormatter={shortDate}
             minTickGap={40}
-            tick={{ fill: '#64748b', fontSize: 10 }}
-            axisLine={{ stroke: '#1e2d4a' }}
+            tick={{ fill: '#71717a', fontSize: 10 }}
+            axisLine={{ stroke: '#2a2a30' }}
             tickLine={false}
             interval="preserveStartEnd"
           />
           <YAxis
             domain={yDomain}
             tickFormatter={(v: number) => v.toFixed(2)}
-            tick={{ fill: '#64748b', fontSize: 10 }}
+            tick={{ fill: '#71717a', fontSize: 10 }}
             axisLine={false}
             tickLine={false}
             width={48}
           />
           <Tooltip content={<CustomTooltip />} />
-          <ReferenceLine y={0} stroke="#1e2d4a" strokeWidth={2} strokeDasharray="4 4" />
+          <ReferenceLine y={0} stroke="#2a2a30" strokeWidth={2} strokeDasharray="4 4" />
           {/* Above zero (backwardation) fill */}
           <Area
             type="monotone"

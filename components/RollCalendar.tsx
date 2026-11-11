@@ -168,7 +168,7 @@ function UrgencyBadge({ days }: { days: number }) {
     cls = 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20';
   }
   return (
-    <span className={['text-[10px] font-bold px-1.5 py-0.5 rounded font-numeric tabular-nums', cls].join(' ')}>
+    <span className={['text-[10px] font-semibold px-1.5 py-0.5 rounded font-numeric tabular-nums', cls].join(' ')}>
       {label}
     </span>
   );
@@ -187,7 +187,7 @@ export default function RollCalendar({ symbols }: { symbols?: string[] } = {}) {
 
   if (symbols && specs.length === 0) {
     return (
-      <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-xl p-8 text-center text-slate-500 text-sm">
+      <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-8 text-center text-slate-500 text-sm">
         Contract calendar rules for {symbols.join(', ')} are not modelled yet. Check the exchange contract specs for first notice and last trading days.
       </div>
     );
@@ -220,10 +220,10 @@ export default function RollCalendar({ symbols }: { symbols?: string[] } = {}) {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-[#1e2d4a]">
+      <div className="overflow-x-auto rounded-lg border border-[#2a2a30]">
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-[#0a0e1a] border-b border-[#1e2d4a]">
+            <tr className="bg-[#0c0c0e] border-b border-[#2a2a30]">
               <th className="text-left px-4 py-2.5 text-slate-500 font-semibold tracking-wide">
                 Commodity
               </th>
@@ -241,7 +241,7 @@ export default function RollCalendar({ symbols }: { symbols?: string[] } = {}) {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#1e2d4a]">
+          <tbody className="divide-y divide-[#2a2a30]">
             {rows.map((row, i) => {
               const days = daysUntil(row.firstNoticeDay < row.lastTradingDay ? row.firstNoticeDay : row.lastTradingDay, now);
               const rowHover = 'hover:bg-white/[0.02] transition-colors';

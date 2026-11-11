@@ -65,7 +65,7 @@ export default function CommodityCard({
       onClick={onClick}
       onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
       className={[
-        'bg-[#0f1629] border border-[#1e2d4a] rounded-lg p-4 cursor-pointer',
+        'bg-[#16161a] border border-[#2a2a30] rounded-lg p-4 cursor-pointer',
         'hover:border-blue-500 transition-all duration-200 group',
         'focus:outline-none focus:ring-2 focus:ring-blue-500/40',
         'select-none fade-in',
@@ -83,7 +83,7 @@ export default function CommodityCard({
             </span>
             <span
               className={[
-                'text-[10px] font-semibold px-1.5 py-0.5 rounded border',
+                'text-[10px] font-medium px-2 py-0.5 rounded border border-transparent',
                 sectorBadgeClass,
               ].join(' ')}
             >
@@ -103,7 +103,7 @@ export default function CommodityCard({
 
       {/* ── Price ────────────────────────────────────────────────── */}
       <div className="mb-3">
-        <span className="font-numeric text-2xl font-bold text-white tabular-nums tracking-tight group-hover:text-blue-100 transition-colors">
+        <span className="font-numeric text-2xl font-semibold text-white tabular-nums tracking-tight group-hover:text-blue-100 transition-colors">
           {formattedPrice}
         </span>
       </div>
@@ -121,7 +121,7 @@ export default function CommodityCard({
           </span>
           <span
             className={[
-              'font-numeric text-[10px] font-bold px-1.5 py-0.5 rounded border tabular-nums',
+              'font-numeric text-[10px] font-semibold px-1.5 py-0.5 rounded border tabular-nums',
               changeClass,
               changeBgClass,
             ].join(' ')}

@@ -50,16 +50,16 @@ const fmt = (v: number | null | undefined) =>
 
 function StatBox({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-[#0a0e1a] border border-[#1e2d4a] rounded-lg p-3">
+    <div className="bg-[#0c0c0e] border border-[#2a2a30] rounded-lg p-3">
       <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest mb-1">{label}</p>
-      <p className="font-numeric text-white font-bold text-base tabular-nums">{value}</p>
+      <p className="font-numeric text-white font-semibold text-base tabular-nums">{value}</p>
     </div>
   );
 }
 
 function Unavailable({ what }: { what: string }) {
   return (
-    <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-xl p-8 text-center text-slate-500 text-sm">
+    <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-8 text-center text-slate-500 text-sm">
       {what} is unavailable right now (Yahoo Finance did not return data). Try again in a few minutes.
     </div>
   );
@@ -95,7 +95,7 @@ export default function CommodityTabs({
       </Link>
 
       {/* Hero */}
-      <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-xl p-6 mb-6">
+      <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-6 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -104,9 +104,9 @@ export default function CommodityTabs({
                 {sector}
               </span>
             </div>
-            <h1 className="text-white text-2xl font-bold mb-2">{name}</h1>
+            <h1 className="text-white text-2xl font-semibold mb-2">{name}</h1>
             <div className="flex items-baseline gap-3">
-              <span className="font-numeric text-3xl font-black text-white tabular-nums">{fmt(price)}</span>
+              <span className="font-numeric text-3xl font-semibold text-white tabular-nums">{fmt(price)}</span>
               <span className="text-slate-500 text-sm">{unit}</span>
             </div>
           </div>
@@ -114,14 +114,14 @@ export default function CommodityTabs({
             <div className="flex flex-col items-start sm:items-end gap-1">
               <div className={['flex items-center gap-1.5', changeClass].join(' ')}>
                 <ChangeTrendIcon className="w-4 h-4" />
-                <span className="font-numeric font-bold text-xl tabular-nums">
+                <span className="font-numeric font-semibold text-xl tabular-nums">
                   {isPositive ? '+' : ''}
                   {change.toFixed(2)}
                 </span>
               </div>
               <span
                 className={[
-                  'font-numeric text-sm font-bold px-2 py-0.5 rounded border tabular-nums',
+                  'font-numeric text-sm font-semibold px-2 py-0.5 rounded border tabular-nums',
                   isPositive ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20' : 'text-red-400 bg-red-400/10 border-red-400/20',
                 ].join(' ')}
               >
@@ -135,18 +135,17 @@ export default function CommodityTabs({
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-0.5 border-b border-[#1e2d4a] mb-6 overflow-x-auto">
+      <div className="flex items-center gap-2 mb-6 overflow-x-auto">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={[
-              'px-4 py-2.5 text-xs font-semibold tracking-wide transition-all relative whitespace-nowrap',
-              activeTab === tab ? 'text-blue-400' : 'text-slate-500 hover:text-slate-300',
+              'rounded-full border px-3 py-1 text-sm transition-colors whitespace-nowrap',
+              activeTab === tab ? 'border-white bg-white text-[#0c0c0e]' : 'border-[#2a2a30] text-slate-400 hover:text-white',
             ].join(' ')}
           >
             {tab}
-            {activeTab === tab && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400 rounded-t-full" />}
           </button>
         ))}
       </div>
@@ -191,17 +190,17 @@ export default function CommodityTabs({
         {activeTab === 'Forward Curve' &&
           (curve && curve.points.length > 0 ? (
             <div className="space-y-5">
-              <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-xl p-5">
+              <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-5">
                 <ForwardCurveChart points={curve.points} curveShape={curve.curveShape} symbol={symbol} name={name} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-lg p-4">
+                <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-4">
                   <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest mb-1">Annualized Roll Yield (M1 vs M2)</p>
                   {curve.rollYield == null ? (
                     <span className="text-slate-500 text-sm">N/A</span>
                   ) : (
                     <>
-                      <span className={['font-numeric text-2xl font-bold tabular-nums', curve.rollYield >= 0 ? 'text-emerald-400' : 'text-red-400'].join(' ')}>
+                      <span className={['font-numeric text-2xl font-semibold tabular-nums', curve.rollYield >= 0 ? 'text-emerald-400' : 'text-red-400'].join(' ')}>
                         {curve.rollYield >= 0 ? '+' : ''}
                         {curve.rollYield.toFixed(2)}%
                       </span>
@@ -214,9 +213,9 @@ export default function CommodityTabs({
                     </>
                   )}
                 </div>
-                <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-lg p-4">
+                <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-4">
                   <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest mb-1">M1 − M2</p>
-                  <span className="font-numeric text-2xl font-bold tabular-nums text-white">
+                  <span className="font-numeric text-2xl font-semibold tabular-nums text-white">
                     {curve.m1m2 == null ? 'N/A' : `${curve.m1m2 >= 0 ? '+' : ''}${curve.m1m2.toFixed(3)}`}
                   </span>
                   <span className="text-slate-500 text-xs ml-2">{unit}</span>
@@ -234,7 +233,7 @@ export default function CommodityTabs({
 
         {activeTab === 'Calendar Spread' &&
           (calendarSpread ? (
-            <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-xl p-5">
+            <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-5">
               <CalendarSpreadChart data={calendarSpread.data} label={`${name} calendar spread · ${calendarSpread.label}`} unit={unit} />
             </div>
           ) : (
@@ -243,7 +242,7 @@ export default function CommodityTabs({
 
         {activeTab === 'Seasonality' &&
           (seasonality ? (
-            <div className="bg-[#0f1629] border border-[#1e2d4a] rounded-xl p-5">
+            <div className="bg-[#16161a] border border-[#2a2a30] rounded-lg p-5">
               <SeasonalityChart {...seasonality} />
             </div>
           ) : (

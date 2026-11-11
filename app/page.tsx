@@ -32,14 +32,14 @@ export default async function DashboardPage() {
       {/* ── Page Header ──────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h1 className="text-white text-2xl font-bold tracking-tight">
+          <h1 className="text-white text-2xl font-semibold tracking-tight">
             Commodity Futures Dashboard
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             Real-time prices · Forward curves · Processing spreads · Roll analytics
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-[#0f1629] border border-[#1e2d4a] rounded-lg px-3 py-2 shrink-0">
+        <div className="flex items-center gap-2 bg-[#16161a] border border-[#2a2a30] rounded-lg px-3 py-2 shrink-0">
           <span className="live-dot w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
           <span className="font-numeric text-slate-400 text-[11px] tabular-nums">
             {timestamp}
@@ -52,7 +52,7 @@ export default async function DashboardPage() {
         <SectorTabsAndGrid commodities={commodities} />
       </section>
 
-      <hr className="border-[#1e2d4a]" />
+      <hr className="border-[#2a2a30]" />
 
       {/* ── Processing Spreads ───────────────────────────────────── */}
       {spreadsData && (
@@ -61,7 +61,7 @@ export default async function DashboardPage() {
         </section>
       )}
 
-      <hr className="border-[#1e2d4a]" />
+      <hr className="border-[#2a2a30]" />
 
       {/* ── Roll Calendar ────────────────────────────────────────── */}
       <section>
